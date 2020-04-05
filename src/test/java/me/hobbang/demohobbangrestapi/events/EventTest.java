@@ -11,8 +11,8 @@ public class EventTest {
     @Test
     public void builder() {
         Event event = Event.builder()
-                .name("Inflearn Spring REST API")
-                .description("REST API development with Spring")
+                .name("hobbang's party")
+                .description("happy hobbang's party")
                 .build();
 
         assertThat(event).isNotNull();
