@@ -1,6 +1,7 @@
 package me.hobbang.demohobbangrestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.hobbang.demohobbangrestapi.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +36,7 @@ public class EventControllerTests {
     EventRepository eventRepository;
 
     @Test
+    @TestDescription("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception {
         EventDto event = EventDto.builder()
                 .name("Spring")
@@ -65,6 +67,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @TestDescription("입력 받을 수 없는 값을 사용한 에러가 발생하는 테스트")
     public void createEvent_Bad_Request() throws Exception {
         Event event = Event.builder()
                 .id(10)
@@ -92,11 +95,12 @@ public class EventControllerTests {
     }
 
     @Test
+    @TestDescription("입력 값이 비어있는 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request_Empty_Input() throws Exception {
         var eventDto = EventDto.builder().build();
 
         this.mockMvc.perform(
-                    post("/api/events")
+                post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest());
@@ -106,6 +110,7 @@ public class EventControllerTests {
     // 끝나는 나라ㅉ가 더 빨라..
     // 맥스가 더 작아.. 베이스보다
     @Test
+    @TestDescription("입력 값이 잘못된 경우에 에러가 발생하는 테스트")
     public void createEvent_Bad_Request_Wrong_Input() throws Exception {
         EventDto event = EventDto.builder()
                 .name("Spring")
@@ -122,8 +127,8 @@ public class EventControllerTests {
 
         this.mockMvc.perform(
                 post("/api/events")
-                .contentType((MediaType.APPLICATION_JSON_UTF8))
-                .content(this.objectMapper.writeValueAsString(event))            )
+                        .contentType((MediaType.APPLICATION_JSON_UTF8))
+                        .content(this.objectMapper.writeValueAsString(event)))
                 .andExpect(status().isBadRequest());
 
     }
