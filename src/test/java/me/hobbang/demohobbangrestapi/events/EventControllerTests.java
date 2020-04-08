@@ -103,5 +103,29 @@ public class EventControllerTests {
 
     }
 
+    // 끝나는 나라ㅉ가 더 빨라..
+    // 맥스가 더 작아.. 베이스보다
+    @Test
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+        EventDto event = EventDto.builder()
+                .name("Spring")
+                .description("Spring REST API TEST")
+                .beginEnrollmentDateTime(LocalDateTime.of(2020, 03, 10, 4, 2, 2))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 03, 19, 4, 2, 2))
+                .beginEventDateTime(LocalDateTime.of(2020, 03, 12, 4, 2, 2))
+                .endEventDateTime(LocalDateTime.of(2020, 03, 11, 4, 2, 2))
+                .basePrice(50000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("중랑구 소방서")
+                .build();
+
+        this.mockMvc.perform(
+                post("/api/events")
+                .contentType((MediaType.APPLICATION_JSON_UTF8))
+                .content(this.objectMapper.writeValueAsString(event))            )
+                .andExpect(status().isBadRequest());
+
+    }
 
 }
