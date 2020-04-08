@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 
+import java.net.URI;
+
 import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
 
 @Controller
@@ -31,7 +33,8 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto,
+                                      Errors errors) {
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors);
         }
@@ -41,13 +44,13 @@ public class EventController {
         }
 
         Event event = modelMapper.map(eventDto, Event.class);
+        event.update();
+        Event newEvent = this.eventRepository.save(event);
         var createdUri = linkTo(EventController.class)
-                .slash(event.getId())
+                .slash(newEvent.getId())
                 .toUri();
-
-        event.setId(10);
         return ResponseEntity
                 .created(createdUri)
-                .body(event);
+                .body(newEvent);
     }
 }

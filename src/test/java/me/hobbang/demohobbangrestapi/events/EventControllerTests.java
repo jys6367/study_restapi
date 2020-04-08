@@ -5,6 +5,7 @@ import me.hobbang.demohobbangrestapi.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,14 +33,12 @@ public class EventControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
-    EventRepository eventRepository;
-
     @Test
     @TestDescription("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception {
-        EventDto event = EventDto.builder()
+        EventDto eventDto = EventDto.builder()
                 .name("Spring")
+                .description("spring REST API TEST!")
                 .beginEnrollmentDateTime(LocalDateTime.of(2020, 03, 10, 4, 2, 2))
                 .closeEnrollmentDateTime(LocalDateTime.of(2020, 03, 11, 4, 2, 2))
                 .beginEventDateTime(LocalDateTime.of(2020, 03, 12, 4, 2, 2))
@@ -51,16 +50,16 @@ public class EventControllerTests {
                 .build();
 
         mockMvc.perform(post("/api/events/")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .accept(MediaTypes.HAL_JSON)
-                .content(objectMapper.writeValueAsString(event)))
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .accept(MediaTypes.HAL_JSON)
+                    .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
-                .andExpect(jsonPath("free").value(Matchers.not("free")))
+                .andExpect(jsonPath("free").value(false))
+                .andExpect(jsonPath("offline").value(true))
 //                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT))  왜안되지
                 .andExpect(jsonPath("eventStatus").value("DRAFT"));
 
@@ -135,6 +134,6 @@ public class EventControllerTests {
                 .andExpect(jsonPath("$[0].defaultMessage").exists())
                 .andExpect(jsonPath("$[0].code").exists())
         ;
-
     }
+
 }
