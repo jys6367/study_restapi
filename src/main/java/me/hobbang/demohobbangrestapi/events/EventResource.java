@@ -3,7 +3,7 @@ package me.hobbang.demohobbangrestapi.events;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 
-import static org.springframework.hateoas.jaxrs.JaxRsLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 public class EventResource extends Resource<Event> {
 
