@@ -1,6 +1,7 @@
 package me.hobbang.demohobbangrestapi.events;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -54,6 +55,7 @@ public class EventController {
         // eventResource.add(selfLinkbuilder.withSelfRel());
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
         eventResource.add(selfLinkbuilder.withRel("update-event"));
+        eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
         return ResponseEntity
                 .created(createdUri)
                 .body(eventResource);
