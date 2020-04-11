@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 
-import java.net.URI;
-
-import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @Controller
-@RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE)
+@RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class EventController {
 
     private final EventRepository eventRepository;
@@ -46,11 +44,18 @@ public class EventController {
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
         Event newEvent = this.eventRepository.save(event);
-        var createdUri = linkTo(EventController.class)
-                .slash(newEvent.getId())
-                .toUri();
+
+
+        var selfLinkbuilder = linkTo(EventController.class)
+                .slash(newEvent.getId());
+        var createdUri = selfLinkbuilder.toUri();
+        EventResource eventResource = new EventResource(event);
+        // resource 만들때 자동으로 들어감.
+        // eventResource.add(selfLinkbuilder.withSelfRel());
+        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        eventResource.add(selfLinkbuilder.withRel("update-event"));
         return ResponseEntity
                 .created(createdUri)
-                .body(newEvent);
+                .body(eventResource);
     }
 }
