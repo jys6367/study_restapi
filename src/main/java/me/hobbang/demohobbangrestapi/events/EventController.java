@@ -115,6 +115,7 @@ public class EventController {
         eventResource.add(new Link("/docs/index.html#resources-events-update").withRel("profile"));
 
         return ResponseEntity.ok(eventResource);
+
     }
 
     private ResponseEntity<ErrorResource> badRequest(Errors errors) {
