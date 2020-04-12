@@ -1,23 +1,12 @@
 package me.hobbang.demohobbangrestapi.events;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import me.hobbang.demohobbangrestapi.common.RestDocsConfiguration;
+import me.hobbang.demohobbangrestapi.common.BaseControllerTest;
 import me.hobbang.demohobbangrestapi.common.TestDescription;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
@@ -31,25 +20,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@Import(RestDocsConfiguration.class)
-@ActiveProfiles("test")
-public class EventControllerTests {
 
-    @Autowired
-    MockMvc mockMvc;
+public class EventControllerTests extends BaseControllerTest {
 
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Autowired
     EventRepository eventRepository;
-
-    @Autowired
-    ModelMapper modelMapper;
 
     @Test
     @TestDescription("정상적으로 이벤트를 생성하는 테스트")
@@ -269,8 +245,8 @@ public class EventControllerTests {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/{id}", event.getId())
-                    .contentType((MediaType.APPLICATION_JSON_UTF8))
-                    .content(this.objectMapper.writeValueAsString(eventDto)))
+                .contentType((MediaType.APPLICATION_JSON_UTF8))
+                .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("name").value(newEventName))
@@ -279,6 +255,7 @@ public class EventControllerTests {
         //todo document
 
     }
+
     @Test
     @TestDescription("입력값이 비어있는 경우에 이벤트 수정 실패")
     public void updateEvnet400() throws Exception {
@@ -289,8 +266,8 @@ public class EventControllerTests {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/{id}", event.getId())
-                    .contentType((MediaType.APPLICATION_JSON_UTF8))
-                    .content(this.objectMapper.writeValueAsString(eventDto)))
+                .contentType((MediaType.APPLICATION_JSON_UTF8))
+                .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -309,8 +286,8 @@ public class EventControllerTests {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/{id}", event.getId())
-                    .contentType((MediaType.APPLICATION_JSON_UTF8))
-                    .content(this.objectMapper.writeValueAsString(eventDto)))
+                .contentType((MediaType.APPLICATION_JSON_UTF8))
+                .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
         ;
@@ -326,8 +303,8 @@ public class EventControllerTests {
 
         // When & Then
         this.mockMvc.perform(put("/api/events/98776", event.getId())
-                    .contentType((MediaType.APPLICATION_JSON_UTF8))
-                    .content(this.objectMapper.writeValueAsString(eventDto)))
+                .contentType((MediaType.APPLICATION_JSON_UTF8))
+                .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
