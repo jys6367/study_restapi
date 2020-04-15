@@ -1,5 +1,4 @@
 package me.hobbang.demohobbangrestapi.events;
-
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 

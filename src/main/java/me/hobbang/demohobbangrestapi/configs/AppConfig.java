@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.ModelMap;
 
 import java.util.Set;
 
@@ -37,14 +36,14 @@ public class AppConfig {
 
             @Override
             public void run(ApplicationArguments args) throws Exception {
-                Account hobbang = Account.builder()
-                        .email("hobbang@email.com")
-                        .password("hobbang")
+                Account keesun = Account.builder()
+                        .email("keesun@email.com")
+                        .password("keesun")
                         .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                         .build();
-
-                accountService.saveAccount(hobbang);
+                accountService.saveAccount(keesun);
             }
         };
     }
+
 }

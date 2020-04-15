@@ -29,7 +29,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     TokenStore tokenStore;
 
     @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) {
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.passwordEncoder(passwordEncoder);
     }
 
@@ -37,19 +37,17 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
                 .withClient("myApp")
-                .authorizedGrantTypes("password", "refresh_tokem")
+                .authorizedGrantTypes("password", "refresh_token")
                 .scopes("read", "write")
                 .secret(this.passwordEncoder.encode("pass"))
                 .accessTokenValiditySeconds(10 * 60)
-                .refreshTokenValiditySeconds(60 * 60);
+                .refreshTokenValiditySeconds(6 * 10 * 60);
     }
 
     @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints.authenticationManager(authenticationManager)
                 .userDetailsService(accountService)
                 .tokenStore(tokenStore);
-
-
     }
 }

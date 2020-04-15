@@ -1,22 +1,20 @@
 package me.hobbang.demohobbangrestapi.events;
 
-import me.hobbang.demohobbangrestapi.common.ErrorResource;
-import org.apache.catalina.authenticator.SavedRequest;
+import me.hobbang.demohobbangrestapi.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
+import java.net.URI;
 import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -31,7 +29,6 @@ public class EventController {
 
     private final EventValidator eventValidator;
 
-
     public EventController(EventRepository eventRepository, ModelMapper modelMapper, EventValidator eventValidator) {
         this.eventRepository = eventRepository;
         this.modelMapper = modelMapper;
@@ -39,11 +36,11 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto,
-                                      Errors errors) {
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if (errors.hasErrors()) {
             return badRequest(errors);
         }
+
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
             return badRequest(errors);
@@ -53,25 +50,19 @@ public class EventController {
         event.update();
         Event newEvent = this.eventRepository.save(event);
 
-
-        var selfLinkbuilder = linkTo(EventController.class)
-                .slash(newEvent.getId());
-        var createdUri = selfLinkbuilder.toUri();
+        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        URI createdUri = selfLinkBuilder.toUri();
         EventResource eventResource = new EventResource(event);
-        // resource 만들때 자동으로 들어감.
-        // eventResource.add(selfLinkbuilder.withSelfRel());
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
-        eventResource.add(selfLinkbuilder.withRel("update-event"));
+        eventResource.add(selfLinkBuilder.withRel("update-event"));
         eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
-        return ResponseEntity
-                .created(createdUri)
-                .body(eventResource);
+        return ResponseEntity.created(createdUri).body(eventResource);
     }
 
     @GetMapping
     public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
         Page<Event> page = this.eventRepository.findAll(pageable);
-        var pagedResources = assembler.toResource(page, t -> new EventResource(t));
+        var pagedResources = assembler.toResource(page, e -> new EventResource(e));
         pagedResources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
         return ResponseEntity.ok(pagedResources);
     }
@@ -85,7 +76,7 @@ public class EventController {
 
         Event event = optionalEvent.get();
         EventResource eventResource = new EventResource(event);
-        eventResource.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
+        eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
         return ResponseEntity.ok(eventResource);
     }
 
@@ -109,18 +100,16 @@ public class EventController {
 
         Event existingEvent = optionalEvent.get();
         this.modelMapper.map(eventDto, existingEvent);
-        Event saveEvent = this.eventRepository.save(existingEvent);
+        Event savedEvent = this.eventRepository.save(existingEvent);
 
-        EventResource eventResource = new EventResource(saveEvent);
+        EventResource eventResource = new EventResource(savedEvent);
         eventResource.add(new Link("/docs/index.html#resources-events-update").withRel("profile"));
 
         return ResponseEntity.ok(eventResource);
-
     }
 
-    private ResponseEntity<ErrorResource> badRequest(Errors errors) {
-        return ResponseEntity.badRequest().body(new ErrorResource(errors));
+    private ResponseEntity badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
-
 
 }
